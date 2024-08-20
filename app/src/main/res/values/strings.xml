@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">SOS</string>
+    <string name="send">SEND</string>
+    <string name="sos">SOS</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="name">Name</string>
+    <string name="add_contact">Add Contact</string>
+    <string name="emergency">Add Emergency Contact before use!</string>
+</resources>
