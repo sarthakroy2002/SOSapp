@@ -1,9 +1,11 @@
 package com.neolit.womensos;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -50,10 +52,19 @@ public class MainActivity extends AppCompatActivity {
         getSMS();
         getLocation();
 
+        if(currentLocationString==null){
+            Toast.makeText(getApplicationContext(), "Please enable location first!", Toast.LENGTH_LONG).show();
+        }
+
         send.setOnClickListener(view -> {
             Log.i(TAG, "Location: " + currentLocationString);
             try {
                 SmsManager smsManager = SmsManager.getDefault();
+
+                if(currentLocationString==null){
+                    Toast.makeText(getApplicationContext(), "Please enable location first!", Toast.LENGTH_LONG).show();
+                }
+
                 if(!currentLocationString.contains("SOS ALERT")){
                     currentLocationString+=" SOS ALERT - HELP NEEDED ASAP";
                 }
@@ -75,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Message Sent", Toast.LENGTH_LONG).show();
             } catch (Exception e) {
                 Log.e(TAG, "SMS failed", e);
-                Toast.makeText(getApplicationContext(), "Some fields is Empty", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Failed to sent message", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -108,12 +119,31 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if( !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
+            MaterialAlertDialogBuilder builder = getMaterialAlertDialogBuilder();
+            builder.show();
+        }
+
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, location -> {
                     if (location != null) {
                         currentLocationString = "Lat: " + location.getLatitude() + ", Lon: " + location.getLongitude();
                     }
                 });
+    }
+
+    private @NonNull MaterialAlertDialogBuilder getMaterialAlertDialogBuilder() {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this);
+        builder.setMessage("Location Services are disabled. You want to enable?");
+        builder.setTitle("Warning!");
+        builder.setCancelable(false);
+        builder.setPositiveButton("Yes", (dialog, which) -> {
+            Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(intent);
+        });
+        builder.setNegativeButton("No", (dialog, which) -> finish());
+        return builder;
     }
 
     @Override
