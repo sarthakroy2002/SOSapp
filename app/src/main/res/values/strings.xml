@@ -6,4 +6,5 @@
     <string name="name">Name</string>
     <string name="add_contact">Add Contact</string>
     <string name="emergency">Add Emergency Contact before use!</string>
+    <string name="emergency_contact_details">Emergency Contact Details</string>
 </resources>
