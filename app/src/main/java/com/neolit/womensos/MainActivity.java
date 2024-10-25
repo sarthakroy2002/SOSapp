@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Build;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Button;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     FloatingActionButton mAbout;
 
     @Override
+    @SuppressWarnings("deprecation") //TODO: Remove along with SmsManager.getDefault() when minsdk is raised.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
@@ -59,7 +61,15 @@ public class MainActivity extends AppCompatActivity {
         send.setOnClickListener(view -> {
             Log.i(TAG, "Location: " + currentLocationString);
             try {
-                SmsManager smsManager = SmsManager.getDefault();
+                SmsManager smsManager;
+
+                // For API 31+ (Android 12+), use getSystemService to get SmsManager instance
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    smsManager = getSystemService(SmsManager.class);
+                } else {
+                    // For API 29-30, fall back to SmsManager.getDefault()
+                    smsManager = SmsManager.getDefault();
+                }
 
                 if(currentLocationString==null){
                     Toast.makeText(getApplicationContext(), "Please enable location first!", Toast.LENGTH_LONG).show();
