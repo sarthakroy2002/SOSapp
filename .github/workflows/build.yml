@@ -16,11 +16,32 @@ jobs:
         distribution: 'zulu'
         java-version: 23
 
+    - name: Install and configure ccache
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ccache
+        export CCACHE_DIR=$HOME/.ccache
+        export CCACHE_COMPRESS=true
+        export CCACHE_MAXSIZE=500M
+        export PATH="/usr/lib/ccache:$PATH"
+
+    - name: Cache ccache
+      uses: actions/cache@v3
+      with:
+        path: ~/.ccache
+        key: ccache-${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ccache-${{ runner.os }}-gradle-
+
     - name: Make gradlew executable
       run: chmod +x ./gradlew
 
     - name: Build with Gradle
       run: ./gradlew assembleDebug
+      env:
+        ANDROID_NON_TRANSITIVE_R_CLASS: true
+        ORG_GRADLE_JVMARGS: "-Dorg.gradle.java.home=${{ env.JAVA_HOME }}"
+        ORG_GRADLE_CACHING: true
 
     - uses: actions/upload-artifact@v4
       with:
