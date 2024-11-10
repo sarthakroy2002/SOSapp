@@ -52,9 +52,9 @@ public class MainActivity extends AppCompatActivity {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         getSMS();
-        getLocation();
 
-        if(currentLocationString==null){
+        while(currentLocationString==null){
+            getLocation();
             Toast.makeText(getApplicationContext(), "Please enable location first!", Toast.LENGTH_LONG).show();
         }
 
@@ -69,10 +69,6 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     // For API 29-30, fall back to SmsManager.getDefault()
                     smsManager = SmsManager.getDefault();
-                }
-
-                if(currentLocationString==null){
-                    Toast.makeText(getApplicationContext(), "Please enable location first!", Toast.LENGTH_LONG).show();
                 }
 
                 if(!currentLocationString.contains("SOS ALERT")){
